@@ -1,0 +1,27 @@
+@RELATION pacman
+
+@ATTRIBUTE pos_x NUMERIC
+@ATTRIBUTE pos_y NUMERIC
+@ATTRIBUTE ghost1_alive {0,1}
+@ATTRIBUTE ghost2_alive {0,1}
+@ATTRIBUTE ghost3_alive {0,1}
+@ATTRIBUTE ghost4_alive {0,1}
+@ATTRIBUTE ghost1_pos_x NUMERIC
+@ATTRIBUTE ghost1_pos_y NUMERIC
+@ATTRIBUTE ghost2_pos_x NUMERIC
+@ATTRIBUTE ghost2_pos_y NUMERIC
+@ATTRIBUTE ghost3_pos_x NUMERIC
+@ATTRIBUTE ghost3_pos_y NUMERIC
+@ATTRIBUTE ghost4_pos_x NUMERIC
+@ATTRIBUTE ghost4_pos_y NUMERIC
+@ATTRIBUTE distance_to_ghost1 NUMERIC
+@ATTRIBUTE distance_to_ghost2 NUMERIC
+@ATTRIBUTE distance_to_ghost3 NUMERIC
+@ATTRIBUTE distance_to_ghost4 NUMERIC
+@ATTRIBUTE legal_north {0,1}
+@ATTRIBUTE legal_south {0,1}
+@ATTRIBUTE legal_east {0,1}
+@ATTRIBUTE legal_west {0,1}
+@ATTRIBUTE chosen_move {1,2,3,4,5}
+@DATA
+
