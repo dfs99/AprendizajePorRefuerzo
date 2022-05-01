@@ -256,6 +256,63 @@ class GameState(object):
         return self.data.ghostDistances
 
     #############################################
+    #             Additions by:                 #
+    #       dfs99 & ricardograndecros           #
+    #############################################
+
+    def getQuadrantNearestGhost(self, distancer):
+
+        ghost_distances = [distancer.getDistance(self.getPacmanPosition(), ghost) for ghost in self.getGhostPositions()]
+        import numpy as np
+        nearestGhostPos = self.getGhostPositions()[np.argmin(ghost_distances)]
+        return self.getQuadrant(nearestGhostPos[0] - self.getPacmanPosition()[0], nearestGhostPos[1] - self.getPacmanPosition()[1])
+
+    def getQuadrantNearestFood(self, distancer):
+        if self.getNumFood():
+            foodPos = []
+            # for loop gets food positions
+            for i in range(self.getFood().width):
+                for j in range(self.getFood().height):
+                    if self.hasFood(i, j):
+                        foodPos.append((i,j))
+            # calculates distances to food
+            foodDist = [distancer.getDistance(self.getPacmanPosition(), foodpos) for foodpos in foodPos]
+            import numpy as np
+            # gets closest food
+            closest_food = foodPos[np.argmin(foodDist)]
+            # now that closest food pos is known, calculate relative distance and quadrant
+            return self.getQuadrant(closest_food[0] - self.getPacmanPosition()[0], closest_food[1] - self.getPacmanPosition()[1])
+        return None
+
+    def getQuadrant(self, x, y):
+        # 0 (north)
+        if x == 0 and y > 0:
+            return 0
+        # 1 (northeast)
+        elif x > 0 and y > 0:
+            return 1
+        # 2 (east)
+        elif x > 0 and y == 0:
+            return 2
+        # 3 (southeast)
+        elif x > 0 and y < 0:
+            return 3
+        # 4 (south)
+        elif x == 0 and y < 0:
+            return 4
+        # 5 (southwest)
+        elif x < 0 and y < 0:
+            return 5
+        # 6 (west)
+        elif x < 0 and y == 0:
+            return 6
+        # 7 (northwest)
+        elif x < 0 and y > 0:
+            return 7
+        else:
+            return 0
+
+    #############################################
     #             Helper methods:               #
     # You shouldn't need to call these directly #
     #############################################
@@ -288,7 +345,7 @@ class GameState(object):
         """
         if (other):
             return self.data == other.data
-        
+
 
     def __hash__( self ):
         """
@@ -525,6 +582,8 @@ def readCommand( argv ):
                       help='Renders the ghosts in the display (cheating)', default=True)
     parser.add_option('-t', '--frameTime', dest='frameTime', type='float',
                       help=default('Time to delay between frames; <0 means keyboard'), default=0.1)
+    parser.add_option('-e', '--experimenter', dest='experiment', type='string',
+                      help='Generates experimenter to produce and generate statistics',default='none')
 
     options, otherjunk = parser.parse_args()
     if len(otherjunk) != 0:
@@ -554,6 +613,7 @@ def readCommand( argv ):
                                                                   options.showGhosts, \
                                                                   frameTime = options.frameTime)
     args['numGames'] = options.numGames
+    args['experiment'] = options.experiment
 
     return args
 
@@ -580,13 +640,20 @@ def loadAgent(pacman, nographics):
                 return getattr(module, pacman)
     raise Exception('The agent ' + pacman + ' is not specified in any *Agents.py.')
 
-def runGames(map_name, layout, pacman, ghosts, display, numGames, maxMoves=-1):
+def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, maxMoves=-1):
     # Hack for agents writing to the display
     import __main__
     __main__.__dict__['_display'] = display
 
     rules = BustersGameRules()
     games = []
+
+    # Modified by Ricardo:
+    # prepares experimenter
+    from experimenter.experimenter import Experimenter
+    experimenter = Experimenter(experiment)
+    if experiment:
+        experimenter.change_qtables()
 
     # Modified by Diego:
     # In order to get the game executed.
@@ -600,6 +667,12 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, maxMoves=-1):
         game.run()
         end = timer()
         games.append(game)
+        if experiment:
+            # for every game, update experimenter info
+            experimenter.games.append(game)
+            experimenter.scores.append(game.state.getScore())
+            experimenter.dumpScores() # update csv
+
         # update and flush.
         num_games += 1
         #print(f"{(200*len(ghosts))-game.state.getScore()},{end-start}")
@@ -612,6 +685,11 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, maxMoves=-1):
         print('Scores:       ', ', '.join([str(score) for score in scores]))
         print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
         print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
+
+    if experiment:
+        # when all games are done, plot and restore qtable
+        experimenter.restore_qtable()
+        experimenter.plotScores()
 
     return games
 

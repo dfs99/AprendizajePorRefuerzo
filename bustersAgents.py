@@ -662,9 +662,9 @@ class QLearningAgent(BustersAgent):
         self.actions = {"North": 0, "East": 1, "South": 2, "West": 3, "Stop": 4}
         self.table_file = open("AprendizajePorRefuerzo/qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0.2
+        self.epsilon = 0.3
         self.alpha = 0.5
-        self.discount_rate = 0.6
+        self.discount_rate = 0.7
         self.estadoJuego = gameState
 
     def readQtable(self):
@@ -714,7 +714,9 @@ class QLearningAgent(BustersAgent):
         For instance, the state (3,1) is the row 7
         """
         # return state[0] + state[1] * 4
-        return 0
+
+        # de momento, devolvemos solo el cuadrante del pacman.
+        return state
 
     def getQValue(self, state, action):
 
@@ -786,12 +788,11 @@ class QLearningAgent(BustersAgent):
         if flip:
             #print("tirando una acción completamente aleatoria...")
             return random.choice(legalActions)
-        x = random.choice(legalActions)
-        #print(f"ahora ponemos una acción aleatoria para vincular la wea esta. {x}")
-        return self.getPolicy(state)
-        # return x
+        #return self.getPolicy(state.getQuadrantNearestGhost(self.distancer))
+        return random.choice(legalActions)
 
-    def update(self, state, action, nextState, reward):
+    def update(self, gamestate, action, nextState, reward):
+        # TODO: ESTOS ESTADOS SON GAMESTATE
         """
         The parent class calls this to observe a
         state = action => nextState and reward transition.
@@ -809,17 +810,19 @@ class QLearningAgent(BustersAgent):
         Q(state,action) <- (1-self.alpha) Q(state,action) + self.alpha * (r + self.discount * max a' Q(nextState, a'))
 
         """
-        #print("*"*20)
-        #print("llamando al updata... actualizar el estado para actualizar las acciones disponibles.")
-        #print(f"Acciones estado anterior {self.estadoJuego.getLegalActions(0)}")
+
+        #print(f"Pacman position {gamestate.getPacmanPosition()} -- Nearest Food Quadrant {gamestate.getQuadrantNearestFood(self.distancer)}")
+        #print(f"Pacman position {gamestate.getPacmanPosition()} -- Nearest Ghost Quadrant {gamestate.getQuadrantNearestGhost(self.distancer)}")
+
+
         # se actualiza el estado del juego en el agente para que pueda tomar las acciones
         # válidas para el siguiente estado.
         self.estadoJuego = nextState
-        #print(f"Acciones estado actual {self.estadoJuego.getLegalActions(0)}")
         # TRACE for transition and position to update. Comment the following lines if you do not want to see that trace
         #         print("Update Q-table with transition: ", state, action, nextState, reward)
-        #print("*"*20)
-        position = self.computePosition(state)
+
+        # todo: le estamos pasando el cuadrante.
+        position = self.computePosition(gamestate.getQuadrantNearestGhost(self.distancer))
         action_column = self.actions[action]
         #
         #         print("Corresponding Q-table cell to update:", position, action_column)
@@ -835,7 +838,7 @@ class QLearningAgent(BustersAgent):
             reward = 300
         else:
             reward = 200
-        print(f"Comprobacion del reward {reward}")
+        #print(f"Comprobacion del reward {reward}")
 
         # TRACE for updated q-table. Comment the following lines if you do not want to see that trace
         #         print("Q-table:")
@@ -846,7 +849,7 @@ class QLearningAgent(BustersAgent):
                 (1 - self.alpha) * self.q_table[position][action_column] + self.alpha * reward
         else:
             self.q_table[position][action_column] = (1 - self.alpha) * self.q_table[position][action_column] + \
-                                                    self.alpha * (reward + self.discount_rate * self.getValue(nextState))
+                                                    self.alpha * (reward + self.discount_rate * self.getValue(nextState.getQuadrantNearestGhost(self.distancer)))
 
     def getPolicy(self, state):
         "Return the best action in the qtable for a given state"
