@@ -680,6 +680,7 @@ class QLearningAgent(BustersAgent):
         return q_table
 
     def writeQtable(self):
+        self.table_file = open("AprendizajePorRefuerzo/qtable.txt", "r+")
         "Write qtable to disc"
         self.table_file.seek(0)
         self.table_file.truncate()
@@ -695,6 +696,7 @@ class QLearningAgent(BustersAgent):
     #                 self.table_file_csv.write(str(item)+", ")
     #             self.table_file_csv.write(str(line[-1]))
     #             self.table_file_csv.write("\n")
+        self.table_file.close()
 
     def printQtable(self):
         "Print qtable"
@@ -704,8 +706,8 @@ class QLearningAgent(BustersAgent):
 
     def __del__(self):
         "Destructor. Invokation at the end of each episode"
-        self.writeQtable()
-        self.table_file.close()
+        #self.writeQtable()
+        #self.table_file.close()
 
     def computePosition(self, state):
         # TODO: MODIFICAR PARA INDEXAR CORRECTAMENTE A LA TABLA.
@@ -824,6 +826,8 @@ class QLearningAgent(BustersAgent):
         # todo: le estamos pasando el cuadrante.
         position = self.computePosition(gamestate.getQuadrantNearestGhost(self.distancer))
         action_column = self.actions[action]
+        print("QUADRANT: ", position, " ---- ACTION: ", action_column)
+        print(reward)
         #
         #         print("Corresponding Q-table cell to update:", position, action_column)
 
@@ -850,6 +854,9 @@ class QLearningAgent(BustersAgent):
         else:
             self.q_table[position][action_column] = (1 - self.alpha) * self.q_table[position][action_column] + \
                                                     self.alpha * (reward + self.discount_rate * self.getValue(nextState.getQuadrantNearestGhost(self.distancer)))
+
+        # save qtable to file
+        self.writeQtable()
 
     def getPolicy(self, state):
         "Return the best action in the qtable for a given state"

@@ -652,7 +652,7 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
     # prepares experimenter
     from experimenter.experimenter import Experimenter
     experimenter = Experimenter(experiment)
-    if experiment:
+    if experiment != "none":
         experimenter.change_qtables()
 
     # Modified by Diego:
@@ -667,7 +667,7 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
         game.run()
         end = timer()
         games.append(game)
-        if experiment:
+        if experiment != "none":
             # for every game, update experimenter info
             experimenter.games.append(game)
             experimenter.scores.append(game.state.getScore())
@@ -686,7 +686,7 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
         print('Win Rate:      %d/%d (%.2f)' % (wins.count(True), len(wins), winRate))
         print('Record:       ', ', '.join([ ['Loss', 'Win'][int(w)] for w in wins]))
 
-    if experiment:
+    if experiment != "none":
         # when all games are done, plot and restore qtable
         experimenter.restore_qtable()
         experimenter.plotScores()
