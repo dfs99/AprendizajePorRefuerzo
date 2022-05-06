@@ -662,9 +662,9 @@ class QLearningAgent(BustersAgent):
         self.actions = {"North": 0, "East": 1, "South": 2, "West": 3, "Stop": 4}
         self.table_file = open("AprendizajePorRefuerzo/qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0.3
-        self.alpha = 0.5
-        self.discount_rate = 0.7
+        self.epsilon = 0.1
+        self.alpha = 0.3
+        self.discount_rate = 0.8
         self.estadoJuego = gameState
 
     def readQtable(self):
@@ -790,8 +790,8 @@ class QLearningAgent(BustersAgent):
         if flip:
             #print("tirando una acción completamente aleatoria...")
             return random.choice(legalActions)
-        #return self.getPolicy(state.getQuadrantNearestGhost(self.distancer))
-        return random.choice(legalActions)
+        return self.getPolicy(state.getQuadrantNearestGhost(self.distancer))
+        #return random.choice(legalActions)
 
     def update(self, gamestate, action, nextState, reward):
         # TODO: ESTOS ESTADOS SON GAMESTATE
@@ -826,20 +826,24 @@ class QLearningAgent(BustersAgent):
         # todo: le estamos pasando el cuadrante.
         position = self.computePosition(gamestate.getQuadrantNearestGhost(self.distancer))
         action_column = self.actions[action]
-        print("QUADRANT: ", position, " ---- ACTION: ", action_column)
-        print(reward)
+        #print("QUADRANT: ", position, " ---- ACTION: ", action_column)
+        #print(reward)
         #
         #         print("Corresponding Q-table cell to update:", position, action_column)
 
         "*** YOUR CODE HERE ***"
-        # todo: la generación de recompensas es irregular. Saca -1, y 4 0's y otro -1 asi todo el rato...
+        # print(f"El refuerzo sin pulir es: {reward}")
+        
+        # Para el caso de la comida.
         if reward == 99 or reward == 100:
             reward = 100
+        # Para cuando no consigue ninguna recompensa.
         elif reward < 2:
             reward = 0
+        # Para cuando consiga comerse un fantasma + una fruta.
         elif reward > 250:
-            # todo: cuando come un pacman y una comida a la vez.
             reward = 300
+        # Para cuando coma fantasma.
         else:
             reward = 200
         #print(f"Comprobacion del reward {reward}")

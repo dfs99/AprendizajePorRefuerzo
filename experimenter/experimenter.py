@@ -1,7 +1,8 @@
 import os
-
 from matplotlib import pyplot as plt
 import csv
+import numpy as np
+
 
 class Experimenter:
     def __init__(self, id):
@@ -16,23 +17,29 @@ class Experimenter:
     def load_experiment(self):
         """ reads experiment csv and loads info in self.games and self.scores """
         try:
-            with open(f'./experimenter/{self.dir}{self.id}.csv', 'r') as experiment_info:
+            with open(f'./experimenter/experiment_{self.id}/{self.id}.csv', 'r') as experiment_info:
                 reader = csv.DictReader(experiment_info)
                 for row in reader:
                     self.scores.append(int(row['score']))
-
-                print(self.scores)
+                #print(self.scores)
         except FileNotFoundError:
             self.scores = []
 
 
 
     def plotScores(self):
+        # get number of files in dir
+        num_files = len(os.listdir(self.dir))
+
         x = range(1, len(self.scores)+1)
         y = self.scores
-        plt.plot(x,y)
-        plt.xticks(x)
-        plt.savefig(f'{self.dir}{self.id}')
+        plt.scatter(x,y,s=10)
+        jumps = int(len(x)/5)
+        plt.xticks(np.arange(min(x), max(x)+1, jumps))
+        plt.xlabel("Número de partidas jugadas.")
+        plt.ylabel("Puntuación obtenida")
+        plt.title("Puntuaciones del experimento")
+        plt.savefig(f'{self.dir}{self.id}_{str(num_files-2)}.png')
 
     def dumpScores(self):
         with open(f'{self.dir}{self.id}.csv', 'w') as experiment_info:
@@ -84,3 +91,5 @@ class Experimenter:
         # write result to experiments file
         with open(f'{self.dir}{self.id}.txt', 'w+') as qtable_experiment:
             qtable_experiment.writelines(result)
+
+

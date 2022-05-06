@@ -677,6 +677,8 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
         num_games += 1
         #print(f"{(200*len(ghosts))-game.state.getScore()},{end-start}")
 
+        print(f'Partida {i} finalizada')
+
     if numGames > 1:
         scores = [game.state.getScore() for game in games]
         wins = [game.state.isWin() for game in games]
