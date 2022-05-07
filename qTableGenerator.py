@@ -2,10 +2,11 @@ import math
 
 # ATTRIBUTES & CARDINALITY
 quadrantGhosts = 8
+discreteDistance = 3
 
 # num actions.
 NUM_ACTIONS = 5
-attributes = [quadrantGhosts]
+attributes = [quadrantGhosts, discreteDistance]
 TABLE_ROWS = math.prod(attributes)
 
 

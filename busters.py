@@ -267,6 +267,28 @@ class GameState(object):
         nearestGhostPos = self.getGhostPositions()[np.argmin(ghost_distances)]
         return self.getQuadrant(nearestGhostPos[0] - self.getPacmanPosition()[0], nearestGhostPos[1] - self.getPacmanPosition()[1])
 
+    def getDiscreteDistanceGhost(self, distancer):
+        pass
+
+    def getMaxDistance(self, distancer):
+        return distancer.getDistance((1,3), (self.data.layout.width-2, self.data.layout.height-2))
+
+    def getDiscreteDistance(self, distancer):
+        
+        # max distance        
+        max_distance= self.getMaxDistance(distancer)
+        # calculate distance to nearest ghost
+        distance = min([distancer.getDistance(self.getPacmanPosition(), ghost) for ghost in self.getGhostPositions()])
+        #print(f"DIstancia al fantasma más cercano: {distance}")
+        # calculate interval size for discretization
+        interval_size = int(max_distance/3)
+        if distance <= interval_size:
+            return 0 # close
+        elif distance > interval_size and distance <= 2*interval_size:
+            return 1 # medium
+        else: 
+            return 2 # far
+
     def getQuadrantNearestFood(self, distancer):
         if self.getNumFood():
             foodPos = []
@@ -656,16 +678,15 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
         experimenter.change_qtables()
 
     # Modified by Diego:
-    # In order to get the game executed.
-    num_games = 0
+    # todo: poner aqui el mismo alpha que en el QLearning Agent
+    ALPHA = 0
+    DECAY = ALPHA / numGames
     from timeit import default_timer as timer
-    #print("map,game,num_actions,time(s)")
     for i in range( numGames ):
-        #print(f"{map_name},{num_games},", end="")
         game = rules.newGame( layout, pacman, ghosts, display, maxMoves )
-        start = timer()
-        game.run()
-        end = timer()
+        #start = timer()
+        game.run(DECAY*(i))
+        #end = timer()
         games.append(game)
         if experiment != "none":
             # for every game, update experimenter info
@@ -673,9 +694,7 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
             experimenter.scores.append(game.state.getScore())
             experimenter.dumpScores() # update csv
 
-        # update and flush.
-        num_games += 1
-        #print(f"{(200*len(ghosts))-game.state.getScore()},{end-start}")
+        
 
         print(f'Partida {i} finalizada')
 

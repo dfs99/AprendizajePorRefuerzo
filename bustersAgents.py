@@ -655,17 +655,19 @@ class BasicAgentAA(BustersAgent):
 
 # todo: clase de agente por aprendizaje por refuerzo.
 class QLearningAgent(BustersAgent):
-
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
         self.actions = {"North": 0, "East": 1, "South": 2, "West": 3, "Stop": 4}
         self.table_file = open("AprendizajePorRefuerzo/qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0.1
-        self.alpha = 0.3
-        self.discount_rate = 0.8
+        self.epsilon = 0
+        self.alpha = 0
+        self.discount_rate = 0
+        
+        # atributos extra:
         self.estadoJuego = gameState
+        #print(f"Distancia máxima del mapa: {self.estadoJuego.getMaxDistance(self.distancer)}")
 
     def readQtable(self):
         "Read qtable from disc"
@@ -712,13 +714,16 @@ class QLearningAgent(BustersAgent):
     def computePosition(self, state):
         # TODO: MODIFICAR PARA INDEXAR CORRECTAMENTE A LA TABLA.
         """
-        Compute the row of the qtable for a given state.
-        For instance, the state (3,1) is the row 7
+            state: es una tupla que contiene todo lo que usamos para representar
+            un determinado estado.
         """
-        # return state[0] + state[1] * 4
+        
 
-        # de momento, devolvemos solo el cuadrante del pacman.
-        return state
+        # Aproximación 1.
+        # Para el caso de los cuadrantes, únicamente devolver el nº del estado.
+        # return state.
+        #print(f"En compute position le llega: {state}")
+        return state[0] + state[1]*7
 
     def getQValue(self, state, action):
 
@@ -790,10 +795,13 @@ class QLearningAgent(BustersAgent):
         if flip:
             #print("tirando una acción completamente aleatoria...")
             return random.choice(legalActions)
-        return self.getPolicy(state.getQuadrantNearestGhost(self.distancer))
+        #print("TOmando accion de la politica:")
+        #print(f"Quadrante: {state.getQuadrantNearestGhost(self.distancer)}")
+        #print(f"Distancia discreta: {state.getDiscreteDistance(self.distancer)}")
+        return self.getPolicy((state.getQuadrantNearestGhost(self.distancer), state.getDiscreteDistance(self.distancer)))
         #return random.choice(legalActions)
 
-    def update(self, gamestate, action, nextState, reward):
+    def update(self, gamestate, action, nextState, reward, decay):
         # TODO: ESTOS ESTADOS SON GAMESTATE
         """
         The parent class calls this to observe a
@@ -824,7 +832,7 @@ class QLearningAgent(BustersAgent):
         #         print("Update Q-table with transition: ", state, action, nextState, reward)
 
         # todo: le estamos pasando el cuadrante.
-        position = self.computePosition(gamestate.getQuadrantNearestGhost(self.distancer))
+        position = self.computePosition((gamestate.getQuadrantNearestGhost(self.distancer), gamestate.getDiscreteDistance(self.distancer)))
         action_column = self.actions[action]
         #print("QUADRANT: ", position, " ---- ACTION: ", action_column)
         #print(reward)
@@ -851,13 +859,21 @@ class QLearningAgent(BustersAgent):
         # TRACE for updated q-table. Comment the following lines if you do not want to see that trace
         #         print("Q-table:")
         #         self.printQtable()
+        new_alpha = self.alpha - decay
+        #print(f"Nuevo valor alpha: {new_alpha}")
         if reward > 0:
             # update q(state,action)
             self.q_table[position][action_column] = \
-                (1 - self.alpha) * self.q_table[position][action_column] + self.alpha * reward
+                (1 - new_alpha) * self.q_table[position][action_column] + new_alpha * reward
         else:
-            self.q_table[position][action_column] = (1 - self.alpha) * self.q_table[position][action_column] + \
-                                                    self.alpha * (reward + self.discount_rate * self.getValue(nextState.getQuadrantNearestGhost(self.distancer)))
+            self.q_table[position][action_column] = (1 - new_alpha) * self.q_table[position][action_column] + \
+                                                    new_alpha * (reward + self.discount_rate * 
+                                                    self.getValue(
+                                                                (
+                                                                    nextState.getQuadrantNearestGhost(self.distancer),
+                                                                    nextState.getDiscreteDistance(self.distancer)
+                                                                )
+                                                    ))
 
         # save qtable to file
         self.writeQtable()

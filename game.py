@@ -595,9 +595,11 @@ class Game(object):
         sys.stdout = OLD_STDOUT
         sys.stderr = OLD_STDERR
 
-    def run(self):
+    def run(self, alpha_decay=0.0):
         """
         Main control loop for game play.
+        parámetro alpha_decay: ha sido introducido para explotar la convergencia al ejecutar 
+        muchas partidas. 
         """
         self.display.initialize(self.state.data)
         self.numMoves = 0
@@ -643,6 +645,7 @@ class Game(object):
         agentIndex = self.startingIndex
         numAgents = len(self.agents)
         step = 0
+        #print(f"mi nuevo decay: {alpha_decay}!")
         while not self.gameOver:
             # Fetch the next agent
             agent = self.agents[agentIndex]
@@ -756,7 +759,7 @@ class Game(object):
                         # todo: insertar el reward
                         # si no ha hecho nada -1, si come una comida 99 y si un fantasma 199
                         # la recompensa se calcula asi.
-                        self.agents[0].update(previous_state, action, self.state, self.state.data.scoreChange)
+                        self.agents[0].update(previous_state, action, self.state, self.state.data.scoreChange, alpha_decay)
                 except Exception as data:
                     self.mute(agentIndex)
                     self._agentCrash(agentIndex)
@@ -770,7 +773,7 @@ class Game(object):
                 if str(type(self.agents[0])) == VALOR_CLASE_APRENDIZAJE_REFUERZO:
                     # previous_state = self.state.deepCopy()
                     # todo: insertar el reward
-                    self.agents[0].update(previous_state, action, self.state, self.state.data.scoreChange)
+                    self.agents[0].update(previous_state, action, self.state, self.state.data.scoreChange, alpha_decay)
             # todo: FIn Parte para QLearning.
 
             # Change the display
