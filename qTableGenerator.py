@@ -4,11 +4,12 @@ import math
 quadrantGhosts = 8
 quadrantFood = 9
 discreteDistance = 3
+wallType = 13
 
 
 # num actions.
 NUM_ACTIONS = 5
-attributes = [quadrantGhosts, quadrantFood, discreteDistance]
+attributes = [quadrantGhosts, quadrantFood, wallType]
 TABLE_ROWS = math.prod(attributes)
 
 

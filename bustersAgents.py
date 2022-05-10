@@ -661,9 +661,9 @@ class QLearningAgent(BustersAgent):
         self.actions = {"North": 0, "East": 1, "South": 2, "West": 3, "Stop": 4}
         self.table_file = open("AprendizajePorRefuerzo/qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0
-        self.alpha = 0
-        self.discount_rate = 0
+        self.epsilon = 0.15
+        self.alpha = 0.5
+        self.discount_rate = 0.9
         self._updated_epsilon = False
         
         # atributos extra:
@@ -730,7 +730,8 @@ class QLearningAgent(BustersAgent):
         #return state[0] + state[1]*7
 
         # Tercer Agente.
-        return state[0] + state[1]*7 + state[2]*24
+        #return state[0] + state[1]*7 + state[2]*24
+        return state[0] + state[2]*8 + state[3]*72
 
     def getQValue(self, state, action):
 
@@ -809,7 +810,9 @@ class QLearningAgent(BustersAgent):
                                 (
                                     state.getQuadrantNearestGhost(self.distancer),
                                     state.getDiscreteDistance(self.distancer),
-                                    state.getQuadrantNearestFood(self.distancer)
+                                    state.getQuadrantNearestFood(self.distancer),
+                                    state.getWallType(self.distancer),
+                                    state.getRemainingFood()
                                 ))
         #return random.choice(legalActions)
 
@@ -849,7 +852,9 @@ class QLearningAgent(BustersAgent):
                                             (
                                                 gamestate.getQuadrantNearestGhost(self.distancer), 
                                                 gamestate.getDiscreteDistance(self.distancer),
-                                                gamestate.getQuadrantNearestFood(self.distancer)
+                                                gamestate.getQuadrantNearestFood(self.distancer),
+                                                gamestate.getWallType(self.distancer),
+                                                gamestate.getRemainingFood()
                                             ))
         action_column = self.actions[action]
         #print("QUADRANT: ", position, " ---- ACTION: ", action_column)
@@ -898,7 +903,9 @@ class QLearningAgent(BustersAgent):
                                                                 (
                                                                     nextState.getQuadrantNearestGhost(self.distancer),
                                                                     nextState.getDiscreteDistance(self.distancer),
-                                                                    gamestate.getQuadrantNearestFood(self.distancer)
+                                                                    nextState.getQuadrantNearestFood(self.distancer),
+                                                                    nextState.getWallType(self.distancer),
+                                                                    nextState.getRemainingFood()
                                                                 )
                                                     ))
 

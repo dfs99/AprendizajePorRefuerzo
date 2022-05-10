@@ -291,7 +291,7 @@ class GameState(object):
             return 2 # far
 
     def getQuadrantNearestFood(self, distancer):
-        if self.getNumFood():
+        if self.getNumFood() > 0:
             foodPos = []
             # for loop gets food positions
             for i in range(self.getFood().width):
@@ -336,14 +336,46 @@ class GameState(object):
             return 0
 
 
-    def getWallType(self):
+    def getWallType(self, distancer):
         pacmanPos = self.getPacmanPosition()
         bottom = self.hasWall(pacmanPos[0], pacmanPos[1]-1)
         top = self.hasWall(pacmanPos[0], pacmanPos[1]+1)
         left = self.hasWall(pacmanPos[0]-1, pacmanPos[1])
         right = self.hasWall(pacmanPos[0]+1, pacmanPos[1])
 
-        if top:
+        if top and left and bottom:
+            return 12
+        elif left and bottom and right:
+            return 11
+        elif top and right and bottom:
+            return 10
+        elif left and top and right:
+            return 9
+        elif left and top:
+            return 8
+        elif bottom and left:
+            return 7
+        elif right and bottom: 
+            return 6
+        elif top and right:
+            return 5
+        elif top and bottom:
+            quadrant_ghost = self.getQuadrantNearestGhost(distancer)
+            if quadrant_ghost in [0,1,7]:
+                return 1
+            elif quadrant_ghost in [3,4,5]:
+                return 3
+            else:
+                return 0
+        elif left and right:
+            quadrant_ghost = self.getQuadrantNearestGhost(distancer)
+            if quadrant_ghost in [5,6,7]:
+                return 4
+            elif quadrant_ghost in [1,2,3]:
+                return 2
+            else:
+                return 0
+        elif top:
             return 1
         elif right:
             return 2
@@ -351,22 +383,8 @@ class GameState(object):
             return 3
         elif left:
             return 4
-        elif top and right:
-            return 5
-        elif right and bottom: 
-            return 6
-        elif bottom and left:
-            return 7
-        elif left and top:
-            return 8
-        elif left and top and right:
-            return 9
-        elif top and right and bottom:
-            return 10
-        elif left and bottom and right:
-            return 11
-        elif top and left and bottom:
-            return 12
+        else:
+            return 0
 
     def getRemainingFood(self):
         # 0 if there is food remaining, else 1
@@ -717,7 +735,7 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
 
     # Modified by Diego:
     # todo: poner aqui el mismo alpha que en el QLearning Agent
-    ALPHA = 0
+    ALPHA = 0.5
     DECAY = ALPHA / numGames
     from timeit import default_timer as timer
     for i in range( numGames ):
