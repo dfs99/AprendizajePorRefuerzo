@@ -18,7 +18,6 @@ from builtins import range
 from builtins import object
 from operator import le
 from past.utils import old_div
-from sklearn.linear_model import ridge_regression
 from game import GameStateData
 from game import Game
 from game import Directions
@@ -343,24 +342,41 @@ class GameState(object):
         left = self.hasWall(pacmanPos[0]-1, pacmanPos[1])
         right = self.hasWall(pacmanPos[0]+1, pacmanPos[1])
 
+        quadrant_ghost = self.getQuadrantNearestGhost(distancer)
+
         if top and left and bottom:
+            if quadrant_ghost in [2]:
+                return 0
             return 12
         elif left and bottom and right:
+            if quadrant_ghost in [0]:
+                return 0
             return 11
         elif top and right and bottom:
+            if quadrant_ghost in [6]:
+                return 0
             return 10
         elif left and top and right:
+            if quadrant_ghost in [4]:
+                return 0
             return 9
         elif left and top:
+            if quadrant_ghost in [2,3,4]:
+                return 0
             return 8
         elif bottom and left:
+            if quadrant_ghost in [0,1,2]:
+                return 0
             return 7
         elif right and bottom: 
+            if quadrant_ghost in [6,7,0]:
+                return 0
             return 6
         elif top and right:
+            if quadrant_ghost in [4,5,6]:
+                return 0
             return 5
         elif top and bottom:
-            quadrant_ghost = self.getQuadrantNearestGhost(distancer)
             if quadrant_ghost in [0,1,7]:
                 return 1
             elif quadrant_ghost in [3,4,5]:
@@ -368,7 +384,6 @@ class GameState(object):
             else:
                 return 0
         elif left and right:
-            quadrant_ghost = self.getQuadrantNearestGhost(distancer)
             if quadrant_ghost in [5,6,7]:
                 return 4
             elif quadrant_ghost in [1,2,3]:
@@ -376,12 +391,20 @@ class GameState(object):
             else:
                 return 0
         elif top:
+            if quadrant_ghost in [2,3,4,5,6]:
+                return 0
             return 1
         elif right:
+            if quadrant_ghost in [0,4,5,6,7]:
+                return 0
             return 2
         elif bottom:
+            if quadrant_ghost in [6,7,0,1,2]:
+                return 0
             return 3
         elif left:
+            if quadrant_ghost in [0,1,2,3,4]:
+                return 0
             return 4
         else:
             return 0
