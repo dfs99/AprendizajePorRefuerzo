@@ -267,8 +267,7 @@ class GameState(object):
         nearestGhostPos = self.getGhostPositions()[np.argmin(ghost_distances)]
         return self.getQuadrant(nearestGhostPos[0] - self.getPacmanPosition()[0], nearestGhostPos[1] - self.getPacmanPosition()[1])
 
-    def getDiscreteDistanceGhost(self, distancer):
-        pass
+    
 
     def getMaxDistance(self, distancer):
         return distancer.getDistance((1,3), (self.data.layout.width-2, self.data.layout.height-2))
@@ -304,7 +303,7 @@ class GameState(object):
             closest_food = foodPos[np.argmin(foodDist)]
             # now that closest food pos is known, calculate relative distance and quadrant
             return self.getQuadrant(closest_food[0] - self.getPacmanPosition()[0], closest_food[1] - self.getPacmanPosition()[1])
-        return None
+        return 8
 
     def getQuadrant(self, x, y):
         # 0 (north)

@@ -269,7 +269,7 @@ class PacmanGraphics(object):
         self.agentImages[agentIndex] = (agentState, prevImage)
 
         if newState._foodEaten != None:
-            print('REMOVE')
+            #print('REMOVE')
             self.removeFood(newState._foodEaten, self.food)
         if newState._capsuleEaten != None:
             self.removeCapsule(newState._capsuleEaten, self.capsules)
