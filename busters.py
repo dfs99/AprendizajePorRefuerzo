@@ -16,7 +16,9 @@ from builtins import zip
 from builtins import str
 from builtins import range
 from builtins import object
+from operator import le
 from past.utils import old_div
+from sklearn.linear_model import ridge_regression
 from game import GameStateData
 from game import Game
 from game import Directions
@@ -332,6 +334,43 @@ class GameState(object):
             return 7
         else:
             return 0
+
+
+    def getWallType(self):
+        pacmanPos = self.getPacmanPosition()
+        bottom = self.hasWall(pacmanPos[0], pacmanPos[1]-1)
+        top = self.hasWall(pacmanPos[0], pacmanPos[1]+1)
+        left = self.hasWall(pacmanPos[0]-1, pacmanPos[1])
+        right = self.hasWall(pacmanPos[0]+1, pacmanPos[1])
+
+        if top:
+            return 1
+        elif right:
+            return 2
+        elif bottom:
+            return 3
+        elif left:
+            return 4
+        elif top and right:
+            return 5
+        elif right and bottom: 
+            return 6
+        elif bottom and left:
+            return 7
+        elif left and top:
+            return 8
+        elif left and top and right:
+            return 9
+        elif top and right and bottom:
+            return 10
+        elif left and bottom and right:
+            return 11
+        elif top and left and bottom:
+            return 12
+
+    def getRemainingFood(self):
+        # 0 if there is food remaining, else 1
+        return 0 if self.getNumFood() > 0 else 1
 
     #############################################
     #             Helper methods:               #
