@@ -267,18 +267,7 @@ def heuristic_function_floyd_warshall(state: PacmanNode):
         return 0
     else:
         return distance_to_closest_ghost
-    """
-    if distance_to_closest_ghost != np.inf and count_ghosts == 1:
-        return distance_to_closest_ghost
-    else:
-        ordered_ghosts = [state.ghosts[index_to_closest_ghost]]
-        for i in range(0, len(state.ghosts)):
-            if i != index_to_closest_ghost:
-                ordered_ghosts.append(state.ghosts[i])
-        heuristic = FloydWarshall(ordered_ghosts)
-        heuristic.solve_all_pairs_shorthest_path()
-        return distance_to_closest_ghost + heuristic.get_minimum_cost_path_to_all_vertices()
-    """
+    
 
 def cost_function_floyd_warshall(state: PacmanNode):
     """
@@ -338,16 +327,7 @@ def enhanced_cost_function_floyd_warshall(state: EnhancedPacmanNode):
     if index_to_closest_ghost == np.inf:
         return total_cost
     return total_cost + len(state._path)
-    """if distance_to_closest_ghost != np.inf and count_ghosts == 1:
-        return total_cost + len(state._path)
-    else:
-        ordered_ghosts = [state.ghosts[index_to_closest_ghost]]
-        for i in range(0, len(state.ghosts)):
-            if i != index_to_closest_ghost:
-                ordered_ghosts.append(state.ghosts[i])
-        heuristic = FloydWarshall(ordered_ghosts)
-        heuristic.solve_all_pairs_shorthest_path()
-        return total_cost + len(state._path) + heuristic.get_minimum_cost_path_to_all_vertices()"""
+    
 
 
 def enhanced_heuristic_function_floyd_warshall(state: EnhancedPacmanNode):
@@ -365,16 +345,7 @@ def enhanced_heuristic_function_floyd_warshall(state: EnhancedPacmanNode):
         return 0
     else:
         return len(state._path)
-    """if distance_to_closest_ghost != np.inf and count_ghosts == 1:
-        return len(state._path)
-    else:
-        ordered_ghosts = [state.ghosts[index_to_closest_ghost]]
-        for i in range(0, len(state.ghosts)):
-            if i != index_to_closest_ghost:
-                ordered_ghosts.append(state.ghosts[i])
-        heuristic = FloydWarshall(ordered_ghosts)
-        heuristic.solve_all_pairs_shorthest_path()
-        return len(state._path) + heuristic.get_minimum_cost_path_to_all_vertices()"""
+    
 
 """
     A* Algorithm

@@ -758,7 +758,7 @@ def runGames(map_name, layout, pacman, ghosts, display, numGames, experiment, ma
 
     # Modified by Diego:
     # todo: poner aqui el mismo alpha que en el QLearning Agent
-    ALPHA = 0.5
+    ALPHA = 0
     DECAY = ALPHA / numGames
     from timeit import default_timer as timer
     for i in range( numGames ):

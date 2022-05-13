@@ -8,8 +8,8 @@ wallType = 13
 
 
 # num actions.
-NUM_ACTIONS = 5
-attributes = [quadrantGhosts, quadrantFood, wallType]
+NUM_ACTIONS = 4
+attributes = [quadrantGhosts, wallType]
 TABLE_ROWS = math.prod(attributes)
 
 

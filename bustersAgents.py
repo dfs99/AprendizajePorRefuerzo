@@ -658,12 +658,13 @@ class QLearningAgent(BustersAgent):
     def registerInitialState(self, gameState):
         BustersAgent.registerInitialState(self, gameState)
         self.distancer = Distancer(gameState.data.layout, False)
-        self.actions = {"North": 0, "East": 1, "South": 2, "West": 3, "Stop": 4}
+        self.actions = {"North": 0, "East": 1, "South": 2, "West": 3}
+        # self.actions = {"North": 0, "East": 1, "South": 2, "West": 3, "Stop": 4}
         self.table_file = open("AprendizajePorRefuerzo/qtable.txt", "r+")
         self.q_table = self.readQtable()
-        self.epsilon = 0.15
-        self.alpha = 0.5
-        self.discount_rate = 0.9
+        self.epsilon = 0.7
+        self.alpha = 0.8
+        self.discount_rate = 0.95
         self._updated_epsilon = False
         
         # atributos extra:
@@ -731,7 +732,13 @@ class QLearningAgent(BustersAgent):
 
         # Tercer Agente.
         #return state[0] + state[1]*7 + state[2]*24
-        return state[0] + state[2]*8 + state[3]*72
+
+        # Cuarto agente.
+        # return state[0] + state[2]*8 + state[3]*72
+
+        # todo: definir nuevo estado
+        #print(f"El estado es: {state[0] + state[3] * 8} con sus respectivos valores por separado: {state[0]} - {state[3]}")
+        return state[0] + state[3] * 8
 
     def getQValue(self, state, action):
 
@@ -754,6 +761,8 @@ class QLearningAgent(BustersAgent):
         """
         # legalActions = self.getLegalActions(state)
         legalActions = self.estadoJuego.getLegalActions(0)
+        # DIego: 
+        if "Stop" in legalActions: legalActions.remove("Stop")
         if len(legalActions) == 0:
             return 0
         return max(self.q_table[self.computePosition(state)])
@@ -766,6 +775,8 @@ class QLearningAgent(BustersAgent):
         """
         # legalActions = self.getLegalActions(state)
         legalActions = self.estadoJuego.getLegalActions(0)
+        # Diego
+        if "Stop" in legalActions: legalActions.remove("Stop")
         if len(legalActions) == 0:
             return None
 
@@ -793,6 +804,11 @@ class QLearningAgent(BustersAgent):
         # Pick Action
         # legalActions = self.getLegalActions(state)
         legalActions = self.estadoJuego.getLegalActions(0)
+
+        if "Stop" in legalActions:
+            #print(f"Stop se encontraba entre las acciones legales y se ha eliminado")
+            legalActions.remove("Stop")
+
         action = None
 
         if len(legalActions) == 0:
@@ -817,6 +833,8 @@ class QLearningAgent(BustersAgent):
         #return random.choice(legalActions)
 
     def update(self, gamestate, action, nextState, reward, decay):
+        
+        if action == "Stop": return
 
         # TODO: ESTOS ESTADOS SON GAMESTATE
         """
@@ -865,6 +883,8 @@ class QLearningAgent(BustersAgent):
         "*** YOUR CODE HERE ***"
         # print(f"El refuerzo sin pulir es: {reward}")
         
+        """
+         #Reward viejo
         # Para el caso de la comida.
         if reward == 99 or reward == 100:
             reward = 500
@@ -884,6 +904,11 @@ class QLearningAgent(BustersAgent):
             else:
                 reward = 100
                
+        """
+        if reward <= 100:
+            reward = 0
+        else:
+            reward = 200
 
         #print(f"Comprobacion del reward {reward}")
 
